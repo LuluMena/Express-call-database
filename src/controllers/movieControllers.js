@@ -53,7 +53,7 @@ const getMovieById = (req, res) => {
       }
     })
     .catch((err) => {
-      console.error(err);
+      // console.error(err);
       res.sendStatus(500);
     });
 };
@@ -62,13 +62,12 @@ const getUsers = (req, res) => {
   database
     .query("SELECT * FROM users")
     .then(([users]) => {
-      res.json(users);
-      res.sendStatus(200);
+      res.status(200).json(users);
     })
     .catch((err) => {
       console.error(err);
       res.sendStatus(500);
-    })
+    });
 }
 
 const getUserById = (req, res) => {
@@ -78,8 +77,7 @@ const getUserById = (req, res) => {
     .query("SELECT * FROM users WHERE id = ?", [id])
     .then(([users]) => {
       if (users[0] != null) {
-        res.json(users[0]);
-        res.sendStatus(200);
+        res.status(200).json(users[0]);
       } else {
         res.sendStatus(404);
       }
