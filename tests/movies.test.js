@@ -3,7 +3,7 @@ const request = require("supertest");
 const app = require("../src/app");
 
 const database = require("../database");
-afterAll(()=> database.end);
+afterAll(() => database.end);
 
 describe("GET /api/movies", () => {
   it("should return all movies", async () => {
@@ -30,3 +30,52 @@ describe("GET /api/movies/:id", () => {
     expect(response.status).toEqual(404);
   });
 });
+
+describe("POST /api/movies", () => {
+  it("should return created movie", async () => {
+    const newMovie = {
+      title: "Star Wars",
+      director: "George Lucas",
+      year: "1977",
+      color: "1",
+      duration: 120,
+    };
+
+    const response = await request(app).post("/api/movies").send(newMovie);
+
+    expect(response.status).toEqual(201);
+    expect(response.body).toHaveProperty("id");
+    expect(typeof response.body.id).toBe("number");
+
+    const [result] = await database.query(
+      "SELECT * FROM movies WHERE id = ?",response.body.id
+    );
+    const [moviesInDatabase] = result;
+
+    expect(moviesInDatabase).toHaveProperty("id");
+    
+    expect(moviesInDatabase).toHaveProperty("title");
+    expect(moviesInDatabase.title).toStrictEqual(newMovie.title);
+
+    expect(moviesInDatabase).toHaveProperty("director");
+    expect(moviesInDatabase.director).toStrictEqual(newMovie.director);
+
+    expect(moviesInDatabase).toHaveProperty("year");
+    expect(moviesInDatabase.year).toStrictEqual(newMovie.year);
+
+    expect(moviesInDatabase).toHaveProperty("color");
+    expect(moviesInDatabase.color).toStrictEqual(newMovie.color);
+
+    expect(moviesInDatabase).toHaveProperty("duration");
+    expect(moviesInDatabase.duration).toStrictEqual(newMovie.duration);
+  })
+  it("should return an error", async () =>{
+    const movieWithMissingProps = {title : "Harry Potter"};
+
+    const response = await request(app)
+      .post("/api/movies")
+      .send(movieWithMissingProps);
+    
+    expect(response.status).toEqual(500);
+  })
+})
