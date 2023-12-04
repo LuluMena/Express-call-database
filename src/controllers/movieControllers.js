@@ -116,6 +116,44 @@ const postUser = (req,res) => {
     })
 }
 
+const updateMovies = (req,res) => {
+  const id = parseInt(req.params.id);
+  const {title, director, year, color, duration} = req.body;
+
+  database
+    .query("UPDATE movies SET title = ?, director = ?, year = ?, color = ?, duration =? WHERE id = ?",[title, director, year, color, duration, id])
+    .then(([result])=> {
+      if(result.affectedRows === 0) {
+        res.sendStatus(404);
+      } else {
+        res.sendStatus(204);
+      }
+    })
+    .catch((err)=>{
+      console.error(err);
+      res.sendStatus(500);
+    })
+}
+
+const updateUsers = (req,res) => {
+  const id = parseInt(req.params.id);
+  const {firstname, lastname, email, city, language} = req.body;
+
+  database
+    .query("UPDATE users SET firstname = ?, lastname = ?, email = ?, city = ?, language = ? WHERE id = ?", [firstname, lastname, email, city, language, id])
+    .then(([result])=>{
+      if (result.affectedRows === 0) {
+        res.sendStatus(404)
+      } else {
+        res.sendStatus(204)
+      }
+    })
+    .catch((err)=>{
+      console.error(err);
+      res.sendStatus(500);
+    })
+}
+
 module.exports = {
   getMovies,
   getMovieById,
@@ -123,4 +161,6 @@ module.exports = {
   postUser,
   getUsers,
   getUserById,
+  updateMovies,
+  updateUsers,
 };
