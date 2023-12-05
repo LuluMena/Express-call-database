@@ -32,7 +32,7 @@ const getMovies = (req, res) => {
   database
     .query("SELECT * FROM movies")
     .then(([movies]) => {
-      res.json(movies); // use res.json instead of console.log
+      res.json(movies);
     })
     .catch((err) => {
       console.error(err);
