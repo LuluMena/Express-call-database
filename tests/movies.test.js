@@ -1,7 +1,5 @@
 const request = require("supertest");
-
 const app = require("../src/app");
-
 const database = require("../database");
 afterAll(() => database.end);
 

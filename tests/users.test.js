@@ -91,7 +91,7 @@ describe("PUT /api/users:id", () => {
     }
 
     const [result] = await database.query(
-      "INSERT INTO userss(firstname, lastname, email, city, language) VALUES (?,?,?,?,?)", [newUser.firstname, newUser.lastname, newUser.email, newUser.city, newUser.language]
+      "INSERT INTO users(firstname, lastname, email, city, language) VALUES (?,?,?,?,?)", [newUser.firstname, newUser.lastname, newUser.email, newUser.city, newUser.language]
     );
     const id = result.insertId;
 
@@ -115,19 +115,19 @@ describe("PUT /api/users:id", () => {
 
     expect(usersInDatabase).toHaveProperty("id");
 
-    expect(usersInDatabase).toHaveProperty("title");
+    expect(usersInDatabase).toHaveProperty("firstname");
     expect(usersInDatabase.firstname).toStrictEqual(usersInDatabase.firstname);
 
-    expect(usersInDatabase).toHaveProperty("director");
+    expect(usersInDatabase).toHaveProperty("lastname");
     expect(usersInDatabase.lastname).toStrictEqual(usersInDatabase.lastname);
 
-    expect(usersInDatabase).toHaveProperty("year");
+    expect(usersInDatabase).toHaveProperty("email");
     expect(usersInDatabase.email).toStrictEqual(usersInDatabase.email);
 
-    expect(usersInDatabase).toHaveProperty("color");
+    expect(usersInDatabase).toHaveProperty("city");
     expect(usersInDatabase.city).toStrictEqual(usersInDatabase.city);
 
-    expect(usersInDatabase).toHaveProperty("duration");
+    expect(usersInDatabase).toHaveProperty("language");
     expect(usersInDatabase.language).toStrictEqual(usersInDatabase.language);
   })
 

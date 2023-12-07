@@ -13,7 +13,7 @@ app.get("/api/users", userControllers.getUsers);
 app.get("/api/users/:id", userControllers.getUserById);
 app.post("/api/movies", validateMovie, movieControllers.postMovie);
 app.post("/api/users", validateUser, userControllers.postUser);
-app.put("/api/movies/:id", movieControllers.putMovies);
-app.put("/api/users/:id", userControllers.putUsers);
+app.put("/api/movies/:id", validateMovie,movieControllers.putMovies);
+app.put("/api/users/:id", validateUser, userControllers.putUsers);
 
 module.exports = app;
