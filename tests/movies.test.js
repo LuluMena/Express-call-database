@@ -3,6 +3,10 @@ const app = require("../src/app");
 const database = require("../database");
 afterAll(() => database.end);
 
+beforeEach(()=>{
+  jest.resetAllMocks();
+})
+
 describe("GET /api/movies", () => {
   it("should return all movies", async () => {
     const response = await request(app).get("/api/movies");
@@ -79,7 +83,7 @@ describe("POST /api/movies", () => {
   })
 })
 
-describe("PUT /api/movies:id", () => {
+describe("PUT /api/movies/:id", () => {
   it("should edit movie", async () => {
     const newMovie = {
       title: "Avatar",
@@ -92,6 +96,10 @@ describe("PUT /api/movies:id", () => {
     const [result] = await database.query(
       "INSERT INTO movies(title, director, year, color, duration) VALUES (?,?,?,?,?)", [newMovie.title, newMovie.director, newMovie.year, newMovie.color, newMovie.duration]
     );
+    // const result = await request(app)
+    //   .post(`/api/movies`)
+    //   .send(newMovie);
+    
     const id = result.insertId;
 
     const updatedMovie = {
@@ -153,5 +161,31 @@ describe("PUT /api/movies:id", () => {
       .send(newMovie);
 
     expect(response.status).toEqual(404);
+  })
+})
+
+describe("DELETE /api/movies/:id",()=>{
+  it("should delete route", async () => {
+     const newMovie = {
+      title: "Deleted Movie",
+      director: "James Cameron",
+      year: "2009",
+      color: "1",
+      duration: 162
+    };
+    
+    const [result] = await database.query("INSERT INTO movies(title, director, year, color, duration) VALUES (?,?,?,?,?)", [newMovie.title, newMovie.director, newMovie.year, newMovie.color, newMovie.duration])
+    const id = result.insertId;
+
+    // delete the newMovie
+    const deleteResponse = await request(app)
+      .delete(`/api/movies/${id}`);
+    expect(deleteResponse.status).toEqual(204);
+
+    //fetching the deleted movie should return 404 error
+    const fetchResponse = await request(app)
+      .get(`/api/movies/${id}`)
+    expect(fetchResponse.status).toEqual(404);
+
   })
 })

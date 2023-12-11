@@ -156,3 +156,31 @@ describe("PUT /api/users:id", () => {
     expect(response.status).toEqual(404);
   })
 })
+
+describe("DELETE /api/users/:id", () => {
+  it("should delete user", async () => {
+    const newUser = {
+      firstname: "Lala",
+      lastname: "Mama",
+      email: `${crypto.randomUUID()}@example.com`,
+      city: "Paris",
+      language: "French"
+    };
+
+    const [result] = await database.query(
+      "INSERT INTO users(firstname, lastname, email, city, language) VALUES (?,?,?,?,?)", [newUser.firstname, newUser.lastname, newUser.email, newUser.city, newUser.language]
+    );
+    const id = result.insertId;
+
+     // delete the newUser
+    const deleteResponse = await request(app)
+      .delete(`/api/users/${id}`);
+    expect(deleteResponse.status).toEqual(204);
+
+    //fetching the deleted user should return 404 error
+    const fetchResponse = await request(app)
+      .get(`/api/users/${id}`)
+    expect(fetchResponse.status).toEqual(404);
+
+  })
+})
