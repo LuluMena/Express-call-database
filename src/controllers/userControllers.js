@@ -1,14 +1,30 @@
 const database = require("../../database");
 
 const getUsers = (req, res) => {
+  let sql = "SELECT * FROM users";
+  const sqlValues = [];
+
+  if (req.query.language != null) {
+    sql += " WHERE language = ?";
+    sqlValues.push(req.query.language);
+
+    if (req.query.city != null) {
+      sql += " AND city = ?";
+      sqlValues.push(req.query.city);
+    }
+  } else if (req.query.city != null) {
+    sql += " WHERE city = ?";
+    sqlValues.push(req.query.city);
+  }
+
   database
-    .query("SELECT * FROM users")
+    .query(sql, sqlValues)
     .then(([users]) => {
       res.status(200).json(users);
     })
     .catch((err) => {
       console.error(err);
-      res.sendStatus(500);
+      res.sendStatus(500).send("Error retrieving data from database");
     });
 }
 
@@ -30,34 +46,34 @@ const getUserById = (req, res) => {
     })
 }
 
-const postUser = (req,res) => {
-  const {firstname, lastname, email, city, language} = req.body;
+const postUser = (req, res) => {
+  const { firstname, lastname, email, city, language } = req.body;
 
   database
-    .query("INSERT INTO users(firstname, lastname, email, city, language) VALUES(?,?,?,?,?)",[firstname, lastname, email, city, language])
-    .then(([result])=>{
-      res.status(201).send({id:result.insertId});
+    .query("INSERT INTO users(firstname, lastname, email, city, language) VALUES(?,?,?,?,?)", [firstname, lastname, email, city, language])
+    .then(([result]) => {
+      res.status(201).send({ id: result.insertId });
     })
-    .catch((err)=>{
+    .catch((err) => {
       console.error(err);
       res.sendStatus(500);
     })
 }
 
-const putUsers = (req,res) => {
+const putUsers = (req, res) => {
   const id = parseInt(req.params.id);
-  const {firstname, lastname, email, city, language} = req.body;
+  const { firstname, lastname, email, city, language } = req.body;
 
   database
     .query("UPDATE users SET firstname = ?, lastname = ?, email = ?, city = ?, language = ? WHERE id = ?", [firstname, lastname, email, city, language, id])
-    .then(([result])=>{
+    .then(([result]) => {
       if (result.affectedRows === 0) {
         res.sendStatus(404);
       } else {
         res.sendStatus(204);
       }
     })
-    .catch((err)=>{
+    .catch((err) => {
       console.error(err);
       res.sendStatus(500);
     })

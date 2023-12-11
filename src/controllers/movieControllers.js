@@ -1,14 +1,31 @@
 const database = require("../../database");
 
 const getMovies = (req, res) => {
+  let sql = "SELECT * FROM movies";
+  const sqlValues = [];
+
+  if (req.query.color != null) {
+    sql += " WHERE color =?";
+    sqlValues.push(req.query.color);
+
+    if (req.query.max_duration != null) {
+      sql += " AND duration <= ?";
+      sqlValues.push(req.query.max_duration);
+    }
+
+  } else if (req.query.max_duration != null) {
+    sql += " WHERE duration <= ?";
+    sqlValues.push(req.query.max_duration);
+  }
+
   database
-    .query("SELECT * FROM movies")
+    .query(sql, sqlValues)
     .then(([movies]) => {
       res.json(movies);
     })
     .catch((err) => {
       console.error(err);
-      res.sendStatus(500);
+      res.sendStatus(500).send("Error retrieving data from database");
     });
 };
 
@@ -30,34 +47,34 @@ const getMovieById = (req, res) => {
     });
 };
 
-const postMovie = (req,res) => {
-  const {title, director, year, color, duration} = req.body;
+const postMovie = (req, res) => {
+  const { title, director, year, color, duration } = req.body;
 
   database
     .query("INSERT INTO movies(title, director, year, color, duration) VALUES(?,?,?,?,?)", [title, director, year, color, duration])
-    .then(([result])=> {
-      res.status(201).send({id:result.insertId});
+    .then(([result]) => {
+      res.status(201).send({ id: result.insertId });
     })
-    .catch((err)=>{
+    .catch((err) => {
       console.log(err);
       res.sendStatus(500);
     })
 }
 
-const putMovies = (req,res) => {
+const putMovies = (req, res) => {
   const id = parseInt(req.params.id);
-  const {title, director, year, color, duration} = req.body;
+  const { title, director, year, color, duration } = req.body;
 
   database
-    .query("UPDATE movies SET title = ?, director = ?, year = ?, color = ?, duration =? WHERE id = ?",[title, director, year, color, duration, id])
-    .then(([result])=> {
+    .query("UPDATE movies SET title = ?, director = ?, year = ?, color = ?, duration =? WHERE id = ?", [title, director, year, color, duration, id])
+    .then(([result]) => {
       if (result.affectedRows === 0) {
         res.sendStatus(404);
       } else {
         res.sendStatus(204);
       }
     })
-    .catch((err)=>{
+    .catch((err) => {
       console.error(err);
       res.sendStatus(500);
     })
